@@ -67,3 +67,24 @@ function viewAllEmployees() {
     });
 }
 
+function viewAllDept(); {
+    connection.query("SELECT * FROM departments", function(err, result) {
+        if (err) throw err;
+        if (result) {
+            //console.log(result);
+            console.table(result);
+            start();
+        }
+    });
+}
+
+function viewAllRoles(); {
+    connection.query("SELECT * FROM roles", function(err, result) {
+        if (err) throw err;
+        if (result) {
+            //console.log(result);
+            console.table(result);
+            start();
+        }
+    });
+}
