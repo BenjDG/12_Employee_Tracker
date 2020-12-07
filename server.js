@@ -79,7 +79,7 @@ function viewAllEmployeesByDept() {
     connection.query(query1, function (err, result) {
         if (err) throw err;
         const array = [];
-        result.forEach(item=>array.push(item))
+        result.forEach(item => array.push(item))
         inquirer
             .prompt({
                 name: "dept",
@@ -93,7 +93,7 @@ function viewAllEmployeesByDept() {
                 JOIN departments ON roles.department_id=departments.id
                 WHERE departments.name = ?`;
                 console.log("answer is: " + answer.dept);
-                connection.query(query2,[answer.dept], function (err, result) {
+                connection.query(query2, [answer.dept], function (err, result) {
                     if (err) throw err;
                     if (result) {
                         //console.log(result);
@@ -113,8 +113,7 @@ function viewAllEmployeesByManager() {
         if (err) throw err;
         console.log(result);
         const array = [];
-        result.forEach(item=>array.push(`${item.employee_id} ${item.manager_first_name} ${item.manager_last_name}`))
-console.log(array);
+        result.forEach(item => array.push(`${item.employee_id} ${item.manager_first_name} ${item.manager_last_name}`))
         inquirer
             .prompt({
                 name: "mngr",
@@ -122,13 +121,12 @@ console.log(array);
                 message: "What manager?",
                 choices: array
             }).then(function (answer) {
-                console.dir(answer);
                 const idNumber = answer.mngr.split(" ");
                 const query2 = `SELECT employees.first_name, employees.last_name
                 FROM employees
                 WHERE employees.manager_id = ?;`;
                 console.log("answer is: " + idNumber[0]);
-                connection.query(query2,[idNumber[0]], function (err, result) {
+                connection.query(query2, [idNumber[0]], function (err, result) {
                     if (err) throw err;
                     if (result) {
                         //console.log(result);
