@@ -28,6 +28,16 @@ function start() {
                 "View All Employees by Manager",
                 "View All Departments",
                 "View All Roles",
+                "Add New Employee",
+                "Add New Role",
+                "Add New Department",
+                "Update Employee Role",
+                "Update Employee Manager",
+                "Update Roles",
+                "Update Department",
+                "Delete Employee",
+                "Delete Role",
+                "Delete Department",
                 "Exit"
             ]
         })
@@ -36,21 +46,47 @@ function start() {
                 case "View All Employees":
                     viewAllEmployees();
                     break;
-
                 case "View All Employees by Department":
                     viewAllEmployeesByDept();
                     break;
-
                 case "View All Employees by Manager":
                     viewAllEmployeesByManager();
                     break;
-
                 case "View All Departments":
                     viewAllDept();
                     break;
-
                 case "View All Roles":
                     viewAllRoles();
+                    break;
+                case "Add New Employee":
+                    addEmployee();
+                    break;
+                case "Add New Role":
+                    addRole();
+                    break;
+                case "Add New Department":
+                    addDept();
+                    break;
+                case "Update Employee Role":
+                    updateEmployeeRole();
+                    break;
+                case "Update Employee Manager":
+                    updateEmployeeManager();
+                    break;
+                case "Update Roles":
+                    updateRoles();
+                    break;
+                case "Update Department":
+                    updateDeptartment();
+                    break;
+                case "Delete Employee":
+                    deleteEmp();
+                    break;
+                case "Delete Role":
+                    deleteRole();
+                    break;
+                case "Delete Department":
+                    deleteDept();
                     break;
                 case "Exit":
                     connection.end();
@@ -60,7 +96,7 @@ function start() {
 }
 
 function viewAllEmployees() {
-    const query = `SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name, roles.salary
+    const query = `SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name AS department, roles.salary
     FROM employees
     JOIN roles ON employees.role_id=roles.id
     JOIN departments ON roles.department_id=departments.id`;
