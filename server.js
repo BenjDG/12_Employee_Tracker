@@ -14,6 +14,7 @@ connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     start();
+
 });
 
 function start() {
@@ -37,20 +38,32 @@ function start() {
                     break;
 
                 case "View All Employees by Department":
-                
-                break;
+                    viewAllEmployeesByDept();
+                    break;
 
                 case "View All Employees by Manager":
-                
-                break;
+                    viewAllEmployeesByManager();
+                    break;
 
                 case "View All Departments":
-                
-                break;
+                    viewAllDept();
+                    break;
 
                 case "View All Roles":
-                
-                break;
+                    viewAllRoles();
+                    break;
             }
-        })
+        });
 }
+
+function viewAllEmployees() {
+    connection.query("SELECT * FROM employees", function(err, result) {
+        if (err) throw err;
+        if (result) {
+            //console.log(result);
+            console.table(result);
+            start();
+        }
+    });
+}
+
