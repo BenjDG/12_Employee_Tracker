@@ -105,6 +105,41 @@ function viewAllEmployeesByDept() {
     })
 }
 
+function viewAllEmployeesByManager() {
+    const query1 = `SELECT DISTINCT mgr.id AS employee_id, mgr.first_name AS manager_first_name, mgr.last_name AS manager_last_name
+    FROM employees AS emp, employees AS mgr
+    WHERE emp.manager_id=mgr.id;`
+    connection.query(query1, function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        const array = [];
+        result.forEach(item=>array.push(`${item.employee_id} ${item.manager_first_name} ${item.manager_last_name}`))
+console.log(array);
+        inquirer
+            .prompt({
+                name: "mngr",
+                type: "list",
+                message: "What manager?",
+                choices: array
+            }).then(function (answer) {
+                console.dir(answer);
+                const idNumber = answer.mngr.split(" ");
+                const query2 = `SELECT employees.first_name, employees.last_name
+                FROM employees
+                WHERE employees.manager_id = ?;`;
+                console.log("answer is: " + idNumber[0]);
+                connection.query(query2,[idNumber[0]], function (err, result) {
+                    if (err) throw err;
+                    if (result) {
+                        //console.log(result);
+                        console.table(result);
+                        start();
+                    }
+                });
+            })
+    })
+}
+
 function viewAllDept() {
     connection.query("SELECT * FROM departments", function (err, result) {
         if (err) throw err;
