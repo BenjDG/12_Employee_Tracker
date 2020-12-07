@@ -194,3 +194,33 @@ function viewAllRoles() {
         }
     });
 }
+
+function addEmployee() {
+    inquirer
+        .prompt([{
+            name: "newEmpFirst",
+            type: "input",
+            message: "What is the employees first name?",
+            validate: nameValidator
+        },
+        {
+            name: "newEmpLast",
+            type: "input",
+            message: "What is the employees last name?",
+            validate: nameValidator
+        }
+        ])
+        .then(function (answer) {
+            console.log(answer);
+        })
+    //connection.query(){}
+}
+
+function nameValidator(name) {
+    console.log(`You entered: ${name}`);
+    const nameRGEX = /^[a-zA-Z]+$/g;
+    const result = nameRGEX.test(name);
+    console.log(`result is ${result}`);
+    if (result) {return true;}
+    else {return "Only use letters, no spaces.";}
+}
