@@ -14,7 +14,6 @@ connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     start();
-
 });
 
 function start() {
@@ -28,7 +27,8 @@ function start() {
                 "View All Employees by Department",
                 "View All Employees by Manager",
                 "View All Departments",
-                "View All Roles"
+                "View All Roles",
+                "Exit"
             ]
         })
         .then(function (answer) {
@@ -52,12 +52,19 @@ function start() {
                 case "View All Roles":
                     viewAllRoles();
                     break;
+                case "Exit":
+                    connection.end();
+                    break;
             }
         });
 }
 
 function viewAllEmployees() {
-    connection.query("SELECT * FROM employees", function(err, result) {
+    const query = `SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name, roles.salary
+    FROM employees
+    JOIN roles ON employees.role_id=roles.id
+    JOIN departments ON roles.department_id=departments.id`;
+    connection.query(query, function (err, result) {
         if (err) throw err;
         if (result) {
             //console.log(result);
@@ -67,8 +74,39 @@ function viewAllEmployees() {
     });
 }
 
+function viewAllEmployeesByDept() {
+    const query1 = `SELECT name FROM departments;`
+    connection.query(query1, function (err, result) {
+        if (err) throw err;
+        const array = [];
+        result.forEach(item=>array.push(item))
+        inquirer
+            .prompt({
+                name: "dept",
+                type: "list",
+                message: "What department?",
+                choices: array
+            }).then(function (answer) {
+                const query2 = `SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name, roles.salary
+                FROM employees
+                JOIN roles ON employees.role_id=roles.id
+                JOIN departments ON roles.department_id=departments.id
+                WHERE departments.name = ?`;
+                console.log("answer is: " + answer.dept);
+                connection.query(query2,[answer.dept], function (err, result) {
+                    if (err) throw err;
+                    if (result) {
+                        //console.log(result);
+                        console.table(result);
+                        start();
+                    }
+                });
+            })
+    })
+}
+
 function viewAllDept() {
-    connection.query("SELECT * FROM departments", function(err, result) {
+    connection.query("SELECT * FROM departments", function (err, result) {
         if (err) throw err;
         if (result) {
             //console.log(result);
@@ -79,7 +117,7 @@ function viewAllDept() {
 }
 
 function viewAllRoles() {
-    connection.query("SELECT * FROM roles", function(err, result) {
+    connection.query("SELECT * FROM roles", function (err, result) {
         if (err) throw err;
         if (result) {
             //console.log(result);
