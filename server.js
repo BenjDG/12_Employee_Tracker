@@ -111,7 +111,6 @@ function viewAllEmployeesByManager() {
     WHERE emp.manager_id=mgr.id;`
     connection.query(query1, function (err, result) {
         if (err) throw err;
-        console.log(result);
         const array = [];
         result.forEach(item => array.push(`${item.employee_id} ${item.manager_first_name} ${item.manager_last_name}`))
         inquirer
