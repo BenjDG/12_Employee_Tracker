@@ -581,9 +581,85 @@ function deleteEmp() {
     })
 }
 
-// function deleteRole() {}
+function deleteRole() {
+    const query = `SELECT id, title FROM roles;`;
+    const arrayRoles = [];
+    connection.query(query, function (err, result) {
+        if (err) console.error(`Unable to delete.`);
+        if (result) {
+            result.forEach(item => arrayRoles.push(`${item.id} ${item.title}`));
+            inquirer
+                .prompt([{
+                    name: "selectRole",
+                    type: "list",
+                    message: "Select a role to Delete:",
+                    choices: arrayRoles
+                },
+                {
+                    name: "confirmSelect",
+                    type: "confirm",
+                    message: "Are you sure?"
+                }
+                ])
+                .then(function (answer) {
+                    const roleId = answer.selectRole.split(" ");
+                    const queryDelete = `DELETE FROM roles WHERE id = ?;`
+                    if (answer.confirmSelect) {
+                        connection.query(queryDelete, [roleId[0]], function(err, result) {
+                            if (err) throw err;
+                            if (result) {
+                                console.log(`Role Deleted`);
+                                start();
+                            }
+                        })
+                    } else {
+                        console.log(`Record not deleted.`);
+                        start();
+                    }
+                })
+        }
+    })
+}
 
-// function deleteDept() {}
+function deleteDept() {
+        const query = `SELECT id, name FROM departments;`;
+        const arrayDpt = [];
+        connection.query(query, function (err, result) {
+            if (err) throw err;
+            if (result) {
+                result.forEach(item => arrayDpt.push(`${item.id} ${item.name}`));
+                inquirer
+                    .prompt([{
+                        name: "selectDpt",
+                        type: "list",
+                        message: "Select a department to Delete:",
+                        choices: arrayDpt
+                    },
+                    {
+                        name: "confirmSelect",
+                        type: "confirm",
+                        message: "Are you sure?"
+                    }
+                    ])
+                    .then(function (answer) {
+                        const dptId = answer.selectDpt.split(" ");
+                        const queryDelete = `DELETE FROM departments WHERE id = ?;`
+                        if (answer.confirmSelect) {
+                            connection.query(queryDelete, [dptId[0]], function(err, result) {
+                                if (err) throw err;
+                                if (result) {
+                                    console.log(`Department Deleted`);
+                                    start();
+                                }
+                            })
+                        } else {
+                            console.log(`Record not deleted.`);
+                            start();
+                        }
+                    })
+            }
+        })
+}
 
 
 
