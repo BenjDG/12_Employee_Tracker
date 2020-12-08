@@ -539,7 +539,47 @@ function updateDept() {
     })
 }
 
-// function deleteEmp() {}
+function deleteEmp() {
+    const query = `SELECT employees.id, employees.first_name, employees.last_name, roles.title
+    FROM employees
+    JOIN roles ON employees.role_id=roles.id;`;
+    const arrayEmp = [];
+    connection.query(query, function (err, result) {
+        if (err) throw err;
+        if (result) {
+            result.forEach(item => arrayEmp.push(`${item.id} ${item.first_name} ${item.last_name} ${item.title}`));
+            inquirer
+                .prompt([{
+                    name: "selectEmp",
+                    type: "list",
+                    message: "Select an employee to Delete:",
+                    choices: arrayEmp
+                },
+                {
+                    name: "confirmSelect",
+                    type: "confirm",
+                    message: "Are you sure?"
+                }
+                ])
+                .then(function (answer) {
+                    const emp = answer.selectEmp.split(" ");
+                    const queryDelete = `DELETE FROM employees WHERE id = ?;`
+                    if (answer.confirmSelect) {
+                        connection.query(queryDelete, [emp[0]], function(err, result) {
+                            if (err) throw err;
+                            if (result) {
+                                console.log(`Employee Deleted`);
+                                start();
+                            }
+                        })
+                    } else {
+                        console.log(`Record not deleted.`);
+                        start();
+                    }
+                })
+        }
+    })
+}
 
 // function deleteRole() {}
 
