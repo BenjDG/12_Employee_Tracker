@@ -299,7 +299,7 @@ function addRole() {
         }
 
     });
-    console.log(`dept Array: ${deptArray}`);
+    //console.log(`dept Array: ${deptArray}`);
     inquirer
         .prompt([{
             name: "newRoleTitle",
@@ -333,6 +333,29 @@ function addRole() {
                     start();
                 }
             });
+        })
+}
+
+function addDept() {
+    inquirer
+        .prompt([{
+            name: "newDeptName",
+            type: "input",
+            message: "What is the name of the new department?",
+            validate: nameValidator
+        }
+        ])
+        .then(function (answer) {
+            const data = [answer.newDeptName]
+
+            connection.query(`INSERT INTO departments(name)
+            VALUES (?)`,[answer.newDeptName], function(err, result) {
+                if (err) throw err;
+                if (result) {
+                    console.log(`Data saved!`);
+                    start();
+                }
+            })
         })
 }
 
