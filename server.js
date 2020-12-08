@@ -408,7 +408,51 @@ function updateEmployeeRole() {
     });
 }
 
-// function updateEmployeeManager() {}
+function updateEmployeeManager() {
+    const queryMgr = `SELECT id, first_name, last_name
+    FROM employees;`;
+    const arrayMgr = [];
+    connection.query(queryMgr, function (err, result) {
+        if (err) throw err;
+        result.forEach(item => arrayMgr.push(`${item.id} ${item.first_name} ${item.last_name}`))
+    });
+    const queryEmp = `SELECT emp.id, emp.first_name, emp.last_name, mgr.first_name AS manager_first_name, mgr.last_name AS manager_last_name
+    FROM employees AS emp, employees AS mgr
+    WHERE emp.manager_id=mgr.id;`;
+    connection.query(queryEmp, function (err, result) {
+        if (err) throw err;
+        const arrayEmp = [];
+        result.forEach(item => arrayEmp.push(`${item.id} ${item.first_name} ${item.last_name} ${item.manager_first_name} ${item.manager_last_name}`))
+        inquirer
+            .prompt([{
+                name: "emp",
+                type: "list",
+                message: "Select the employee to update: ",
+                choices: arrayEmp
+            },
+            {
+                name: "newMgr",
+                type: "list",
+                message: "Select the employee's new manager: ",
+                choices: arrayMgr
+            }
+            ])
+            .then(function (answer) {
+                const empId = answer.emp.split(" ");
+                const mgrId = answer.newMgr.split(" ");
+                const queryUpdateMgr = `UPDATE employees
+                SET manager_id = ?
+                WHERE id = ?;`;
+                connection.query(queryUpdateMgr, [mgrId[0], empId[0]], function (err, result) {
+                    if (err) throw err;
+                    if (result) {
+                        console.log(`Data saved!`);
+                        start();
+                    }
+                })
+            })
+    })
+}
 
 // function updateRoles() {}
 
