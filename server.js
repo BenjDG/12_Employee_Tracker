@@ -196,31 +196,83 @@ function viewAllRoles() {
 }
 
 function addEmployee() {
-    inquirer
-        .prompt([{
-            name: "newEmpFirst",
-            type: "input",
-            message: "What is the employees first name?",
-            validate: nameValidator
-        },
-        {
-            name: "newEmpLast",
-            type: "input",
-            message: "What is the employees last name?",
-            validate: nameValidator
+    //Get list of emp for mgr selection
+    const queryEmp = `SELECT id, first_name, last_name
+    FROM employees;`;
+    const arrayEmp = [];
+    connection.query(queryEmp, function (err, results) {
+        if (err) throw err;
+        if (results) {
+            //console.log("Employees: ");
+            //console.dir(results);
+            results.forEach(item => arrayEmp.push(`${item.id} ${item.first_name} ${item.last_name}`))
         }
-        ])
-        .then(function (answer) {
-            console.log(answer);
-        })
+        //console.log(arrayEmp);
+    })
+    
+
+    //Get list of roles for selection
+    const queryRoles = `SELECT id, title
+    FROM roles;`;
+    const arrayRoles = [];
+    connection.query(queryRoles, function (err, results) {
+        if (err) throw err;
+        if (results) {
+           //console.log("Roles: ");
+            //console.dir(results);
+            results.forEach(item => arrayRoles.push(`${item.id} ${item.title}`))
+        }
+        //console.log(arrayRoles);
+    })
+   
+        inquirer
+            .prompt([{
+                name: "newEmpFirst",
+                type: "input",
+                message: "What is the employees first name?",
+                validate: nameValidator
+            },
+            {
+                name: "newEmpLast",
+                type: "input",
+                message: "What is the employees last name?",
+                validate: nameValidator
+            },
+            {
+                name: "selectMgr",
+                type: "list",
+                message: "Select a manager for this employee",
+                choices: arrayEmp
+            },
+            {
+                name: "selectRole",
+                type: "list",
+                message: "Select a Role:",
+                choices: arrayRoles
+            }
+
+            ])
+            .then(function (answer) {
+                //console.log(answer);
+                const query = `INSERT INTO employees(first_name, last_name, role_id, manager_id)
+                VALUES (?, ?, ?, ?)`;
+                const mgr = answer.selectMgr.split(" ");
+                const role = answer.selectRole.split(" ");
+                const data = [answer.newEmpFirst, answer.newEmpLast, +role[0], +mgr[0]]
+                connection.query(query, data, function (err, result) {
+                    if (err) throw err;
+                    if (result) {
+                        console.log(`Data saved!`);
+                        start();
+                    }
+                });
+            });
     //connection.query(){}
 }
 
 function nameValidator(name) {
-    console.log(`You entered: ${name}`);
     const nameRGEX = /^[a-zA-Z]+$/g;
     const result = nameRGEX.test(name);
-    console.log(`result is ${result}`);
-    if (result) {return true;}
-    else {return "Only use letters, no spaces.";}
+    if (result) { return true; }
+    else { return "Only use letters, no spaces."; }
 }
