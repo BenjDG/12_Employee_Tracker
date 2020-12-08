@@ -365,7 +365,7 @@ function updateEmployeeRole() {
     connection.query(queryRole, function (err, results) {
         if (err) throw err;
         if (results) {
-            results.forEach(value => arrayRole.push(`${value.id} ${value.title}`))
+            results.forEach(value => arrayRole.push(`${value.id} ${value.title}`));
         }
     });
     const queryEmp = `SELECT employees.id, employees.first_name, employees.last_name, roles.title
@@ -380,7 +380,7 @@ function updateEmployeeRole() {
                 .prompt([{
                     name: "selectEmp",
                     type: "list",
-                    message: "Select a employee to update:",
+                    message: "Select an employee to update:",
                     choices: arrayEmp
                 },
                 {
@@ -478,8 +478,8 @@ function updateRoles() {
                     type: "input",
                     message: "Enter an updated salary number:",
                     validate: numValidator
-                }            
-            ])
+                }
+                ])
                 .then(function (answer) {
                     //console.dir(answer);
                     const roleId = answer.selectRole.split(" ");
@@ -498,7 +498,46 @@ function updateRoles() {
     });
 }
 
-// function updateDept() {}
+function updateDept() {
+    const queryDpt = `SELECT id, name FROM departments;`;
+    const dptArray = [];
+    connection.query(queryDpt, function (err, result) {
+        if (err) throw err;
+        if (result) {
+            result.forEach(i => dptArray.push(`${i.id} ${i.name}`))
+        }
+        inquirer
+            .prompt([{
+                name: "selectDpt",
+                type: "list",
+                message: "Select a department name to update:",
+                choices: dptArray
+            },
+            {
+                name: "updateDpt",
+                type: "input",
+                message: "What is the updated department name?",
+                validate: titleValidator
+            }
+            ])
+            .then(function (answer) {
+                //console.dir(answer);
+                //console.log(`new value: ${answer.updateDpt}`);
+                const selectId = answer.selectDpt.split(" ");
+                //console.log(`selectId: ${selectId}`);
+                const queryUpdateDpt = `UPDATE departments
+            SET name = ?
+            WHERE id = ?;`;
+                connection.query(queryUpdateDpt, [answer.updateDpt, selectId[0]], function (err, result) {
+                    if (err) throw err;
+                    if (result) {
+                        console.log(`Data saved!`);
+                        start();
+                    }
+                })
+            })
+    })
+}
 
 // function deleteEmp() {}
 
