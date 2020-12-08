@@ -77,7 +77,7 @@ function start() {
                     updateRoles();
                     break;
                 case "Update Department":
-                    updateDeptartment();
+                    updateDept();
                     break;
                 case "Delete Employee":
                     deleteEmp();
@@ -349,7 +349,7 @@ function addDept() {
             const data = [answer.newDeptName]
 
             connection.query(`INSERT INTO departments(name)
-            VALUES (?)`,[answer.newDeptName], function(err, result) {
+            VALUES (?)`, [answer.newDeptName], function (err, result) {
                 if (err) throw err;
                 if (result) {
                     console.log(`Data saved!`);
@@ -358,6 +358,69 @@ function addDept() {
             })
         })
 }
+
+function updateEmployeeRole() {
+    const queryRole = `SELECT id, title FROM roles;`;
+    const arrayRole = [];
+    connection.query(queryRole, function (err, results) {
+        if (err) throw err;
+        if (results) {
+            results.forEach(value => arrayRole.push(`${value.id} ${value.title}`))
+        }
+    });
+    const queryEmp = `SELECT employees.id, employees.first_name, employees.last_name, roles.title
+    FROM employees
+    JOIN roles ON employees.role_id=roles.id;`;
+    const arrayEmp = [];
+    connection.query(queryEmp, function (err, results) {
+        if (err) throw err;
+        if (results) {
+            results.forEach(item => arrayEmp.push(`${item.id} ${item.first_name} ${item.last_name} ${item.title}`));
+            inquirer
+                .prompt([{
+                    name: "selectEmp",
+                    type: "list",
+                    message: "Select a employee to update:",
+                    choices: arrayEmp
+                },
+                {
+                    name: "selectRole",
+                    type: "list",
+                    message: "Select new role:",
+                    choices: arrayRole
+                }
+                ])
+                .then(function (answer) {
+                    const emp = answer.selectEmp.split(" ");
+                    const role = answer.selectRole.split(" ");
+                    const queryUpdateRole = `UPDATE employees
+                        SET role_id = ?
+                        WHERE id = ?;`;
+                    connection.query(queryUpdateRole, [role[0], emp[0]], function (err, result) {
+                        if (err) throw err;
+                        if (result) {
+                            console.log(`Data saved!`);
+                            start();
+                        }
+                    });
+                });
+        }
+    });
+}
+
+// function updateEmployeeManager() {}
+
+// function updateRoles() {}
+
+// function updateDept() {}
+
+// function deleteEmp() {}
+
+// function deleteRole() {}
+
+// function deleteDept() {}
+
+
 
 function nameValidator(name) {
     const nameRGEX = /^[a-zA-Z]+$/g;
