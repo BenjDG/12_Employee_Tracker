@@ -255,12 +255,12 @@ function addEmployee() {
         ])
         .then(function (answer) {
             //console.log(answer);
-            
+
             const mgr = answer.selectMgr.split(" ");
             const role = answer.selectRole.split(" ");
 
 
-            if (mgr[0]==="None") {
+            if (mgr[0] === "None") {
                 console.log(`None was hit ${mgr}`);
                 const query = `INSERT INTO employees(first_name, last_name, role_id)
                 VALUES (?, ?, ?)`;
@@ -285,16 +285,55 @@ function addEmployee() {
                     }
                 });
             }
-
-            // connection.query(query, data, function (err, result) {
-            //     if (err) throw err;
-            //     if (result) {
-            //         console.log(`Data saved!`);
-            //         start();
-            //     }
-            // });
         });
-    //connection.query(){}
+}
+
+function addRole() {
+    const queryDept = `SELECT * FROM departments;`;
+    const deptArray = [];
+    connection.query(queryDept, function (err, results) {
+        if (err) throw err;
+        if (results) {
+            console.dir(results);
+            results.forEach(item => deptArray.push(`${item.id} ${item.name}`))
+        }
+
+    });
+    console.log(`dept Array: ${deptArray}`);
+    inquirer
+        .prompt([{
+            name: "newRoleTitle",
+            type: "input",
+            message: "What is the title of the new role?",
+            validate: nameValidator
+        },
+        {
+            name: "newSalary",
+            type: "input",
+            message: "What is the salary amount for the new role?",
+            validate: numValidator
+        },
+        {
+            name: "selectDept",
+            type: "list",
+            message: "Select a department for this new role:",
+            choices: deptArray
+        }
+        ])
+        .then(function (answer) {
+            console.dir(answer);
+            const dept = answer.selectDept.split(" ");
+            const query = `INSERT INTO roles(title, salary, department_id)
+            VALUES (?, ?, ?)`;
+            const data = [answer.newRoleTitle, answer.newSalary, dept[0]];
+            connection.query(query, data, function (err, result) {
+                if (err) throw err;
+                if (result) {
+                    console.log(`Data saved!`);
+                    start();
+                }
+            });
+        })
 }
 
 function nameValidator(name) {
@@ -302,4 +341,11 @@ function nameValidator(name) {
     const result = nameRGEX.test(name);
     if (result) { return true; }
     else { return "Only use letters, no spaces."; }
+}
+
+function numValidator(num) {
+    const numRGEX = /^[0-9]+$/g;
+    const result = numRGEX.test(num);
+    if (result) { return true; }
+    else { return "Only use numbers, no spaces."; }
 }
