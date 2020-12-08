@@ -545,7 +545,9 @@ function deleteEmp() {
     JOIN roles ON employees.role_id=roles.id;`;
     const arrayEmp = [];
     connection.query(query, function (err, result) {
-        if (err) throw err;
+        if (err) {console.error(err)
+            start();
+        };
         if (result) {
             result.forEach(item => arrayEmp.push(`${item.id} ${item.first_name} ${item.last_name} ${item.title}`));
             inquirer
@@ -566,7 +568,9 @@ function deleteEmp() {
                     const queryDelete = `DELETE FROM employees WHERE id = ?;`
                     if (answer.confirmSelect) {
                         connection.query(queryDelete, [emp[0]], function(err, result) {
-                            if (err) throw err;
+                            if (err) {console.error(err)
+                                start();
+                            };
                             if (result) {
                                 console.log(`Employee Deleted`);
                                 start();
@@ -585,7 +589,9 @@ function deleteRole() {
     const query = `SELECT id, title FROM roles;`;
     const arrayRoles = [];
     connection.query(query, function (err, result) {
-        if (err) console.error(`Unable to delete.`);
+        if (err) {console.error(err)
+            start();
+        };
         if (result) {
             result.forEach(item => arrayRoles.push(`${item.id} ${item.title}`));
             inquirer
@@ -606,7 +612,9 @@ function deleteRole() {
                     const queryDelete = `DELETE FROM roles WHERE id = ?;`
                     if (answer.confirmSelect) {
                         connection.query(queryDelete, [roleId[0]], function(err, result) {
-                            if (err) throw err;
+                            if (err) {console.error(err)
+                                start();
+                            };
                             if (result) {
                                 console.log(`Role Deleted`);
                                 start();
@@ -625,7 +633,7 @@ function deleteDept() {
         const query = `SELECT id, name FROM departments;`;
         const arrayDpt = [];
         connection.query(query, function (err, result) {
-            if (err) throw err;
+            if (err) {console.error(err)};
             if (result) {
                 result.forEach(item => arrayDpt.push(`${item.id} ${item.name}`));
                 inquirer
@@ -646,7 +654,9 @@ function deleteDept() {
                         const queryDelete = `DELETE FROM departments WHERE id = ?;`
                         if (answer.confirmSelect) {
                             connection.query(queryDelete, [dptId[0]], function(err, result) {
-                                if (err) throw err;
+                                if (err) {console.error(err)
+                                    start();
+                                };
                                 if (result) {
                                     console.log(`Department Deleted`);
                                     start();
