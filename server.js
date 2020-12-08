@@ -454,7 +454,49 @@ function updateEmployeeManager() {
     })
 }
 
-// function updateRoles() {}
+function updateRoles() {
+    const rolesArr = [];
+    connection.query("SELECT id, title, salary FROM roles;", function (err, result) {
+        if (err) throw err;
+        if (result) {
+            result.forEach(i => rolesArr.push(`${i.id} ${i.title} ${i.salary}`))
+            inquirer
+                .prompt([{
+                    name: "selectRole",
+                    type: "list",
+                    message: "Select a role to update:",
+                    choices: rolesArr
+                },
+                {
+                    name: "updateTitle",
+                    type: "input",
+                    message: "What is the updated title?",
+                    validate: titleValidator
+                },
+                {
+                    name: "updateSalary",
+                    type: "input",
+                    message: "Enter an updated salary number:",
+                    validate: numValidator
+                }            
+            ])
+                .then(function (answer) {
+                    //console.dir(answer);
+                    const roleId = answer.selectRole.split(" ");
+                    const query = `UPDATE roles
+                    SET title = ?, salary = ? 
+                    WHERE id = ?;`;
+                    connection.query(query, [answer.updateTitle, answer.updateSalary, roleId[0]], function (err, result) {
+                        if (err) throw err;
+                        if (result) {
+                            console.log(`Data saved!`);
+                            start();
+                        }
+                    })
+                })
+        }
+    });
+}
 
 // function updateDept() {}
 
@@ -478,4 +520,11 @@ function numValidator(num) {
     const result = numRGEX.test(num);
     if (result) { return true; }
     else { return "Only use numbers, no spaces."; }
+}
+
+function titleValidator(title) {
+    const titleRGEX = /^[a-zA-Z.\s]+$/g;
+    const result = titleRGEX.test(title);
+    if (result) { return true; }
+    else { return "Only use numbers, spaces, or periods."; }
 }
