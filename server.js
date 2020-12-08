@@ -259,7 +259,6 @@ function addEmployee() {
             const mgr = answer.selectMgr.split(" ");
             const role = answer.selectRole.split(" ");
 
-            console.log(`mgr value is: ${mgr[0]}`);
 
             if (mgr[0]==="None") {
                 console.log(`None was hit ${mgr}`);
