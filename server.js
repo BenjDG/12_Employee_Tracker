@@ -206,10 +206,11 @@ function addEmployee() {
             //console.log("Employees: ");
             //console.dir(results);
             results.forEach(item => arrayEmp.push(`${item.id} ${item.first_name} ${item.last_name}`))
+            arrayEmp.push("None");
         }
         //console.log(arrayEmp);
     })
-    
+
 
     //Get list of roles for selection
     const queryRoles = `SELECT id, title
@@ -218,47 +219,53 @@ function addEmployee() {
     connection.query(queryRoles, function (err, results) {
         if (err) throw err;
         if (results) {
-           //console.log("Roles: ");
+            //console.log("Roles: ");
             //console.dir(results);
             results.forEach(item => arrayRoles.push(`${item.id} ${item.title}`))
         }
         //console.log(arrayRoles);
     })
-   
-        inquirer
-            .prompt([{
-                name: "newEmpFirst",
-                type: "input",
-                message: "What is the employees first name?",
-                validate: nameValidator
-            },
-            {
-                name: "newEmpLast",
-                type: "input",
-                message: "What is the employees last name?",
-                validate: nameValidator
-            },
-            {
-                name: "selectMgr",
-                type: "list",
-                message: "Select a manager for this employee",
-                choices: arrayEmp
-            },
-            {
-                name: "selectRole",
-                type: "list",
-                message: "Select a Role:",
-                choices: arrayRoles
-            }
 
-            ])
-            .then(function (answer) {
-                //console.log(answer);
-                const query = `INSERT INTO employees(first_name, last_name, role_id, manager_id)
-                VALUES (?, ?, ?, ?)`;
-                const mgr = answer.selectMgr.split(" ");
-                const role = answer.selectRole.split(" ");
-                const data = [answer.newEmpFirst, answer.newEmpLast, +role[0], +mgr[0]]
+    inquirer
+        .prompt([{
+            name: "newEmpFirst",
+            type: "input",
+            message: "What is the employees first name?",
+            validate: nameValidator
+        },
+        {
+            name: "newEmpLast",
+            type: "input",
+            message: "What is the employees last name?",
+            validate: nameValidator
+        },
+        {
+            name: "selectMgr",
+            type: "list",
+            message: "Select a manager for this employee",
+            choices: arrayEmp
+        },
+        {
+            name: "selectRole",
+            type: "list",
+            message: "Select a Role:",
+            choices: arrayRoles
+        }
+
+        ])
+        .then(function (answer) {
+            //console.log(answer);
+            
+            const mgr = answer.selectMgr.split(" ");
+            const role = answer.selectRole.split(" ");
+
+            console.log(`mgr value is: ${mgr[0]}`);
+
+            if (mgr[0]==="None") {
+                console.log(`None was hit ${mgr}`);
+                const query = `INSERT INTO employees(first_name, last_name, role_id)
+                VALUES (?, ?, ?)`;
+                const data = [answer.newEmpFirst, answer.newEmpLast, +role[0]]
                 connection.query(query, data, function (err, result) {
                     if (err) throw err;
                     if (result) {
@@ -266,7 +273,28 @@ function addEmployee() {
                         start();
                     }
                 });
-            });
+
+            } else {
+                const query = `INSERT INTO employees(first_name, last_name, role_id, manager_id)
+                VALUES (?, ?, ?, ?)`;
+                const data = [answer.newEmpFirst, answer.newEmpLast, +role[0], +mgr[0]];
+                connection.query(query, data, function (err, result) {
+                    if (err) throw err;
+                    if (result) {
+                        console.log(`Data saved!`);
+                        start();
+                    }
+                });
+            }
+
+            // connection.query(query, data, function (err, result) {
+            //     if (err) throw err;
+            //     if (result) {
+            //         console.log(`Data saved!`);
+            //         start();
+            //     }
+            // });
+        });
     //connection.query(){}
 }
 
