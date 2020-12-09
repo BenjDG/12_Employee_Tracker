@@ -671,8 +671,6 @@ function deleteDept() {
         })
 }
 
-
-
 function nameValidator(name) {
     const nameRGEX = /^[a-zA-Z]+$/g;
     const result = nameRGEX.test(name);
